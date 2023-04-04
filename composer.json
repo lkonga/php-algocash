@@ -26,5 +26,5 @@
         "tests": "./vendor/bin/phpunit --testdox --prepend config.tests.php --whitelist lib --coverage-html coverage tests",
         "dev-server": "PHP_CLI_SERVER_WORKERS=2 php -S localhost:4000 -t server/",
         "dev-tunnel": "ngrok http 4000"
-    },
+    }
 }
