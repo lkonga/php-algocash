@@ -27,10 +27,4 @@
         "dev-server": "PHP_CLI_SERVER_WORKERS=2 php -S localhost:4000 -t server/",
         "dev-tunnel": "ngrok http 4000"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/lkonga/php-algocash.git"
-        }
-    ]
 }
