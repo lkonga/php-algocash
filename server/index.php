@@ -76,6 +76,11 @@
             </div>
             <div class="row align-items-center pt-4">
                 <div class="col text-center">
+                    <a href="status.php" class="w-25 btn btn-primary">Transaction Status</a>
+                </div>
+            </div>
+            <div class="row align-items-center pt-4">
+                <div class="col text-center">
                     <a href="paybalance.php" class="w-25 btn btn-primary">PayBalance Tester</a>
                 </div>
             </div>

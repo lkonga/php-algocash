@@ -3,4 +3,5 @@ composer.lock
 tests/config.php
 /coverage/
 .env
+.env_
 .idea/
