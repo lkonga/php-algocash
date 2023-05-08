@@ -2,7 +2,7 @@
 require_once(__DIR__ . "/../vendor/autoload.php");
 require_once(__DIR__ . "/../config.tests.php");
 
-use AlgorithmicCash\PayInStatusRequest;
+use AlgorithmicCash\TxStatusRequest;
 
 $merchantTxId = "TEST-" . time();
 $requestAmount = "500";
@@ -14,11 +14,15 @@ $handlerUrl = $baseUrl . "/handler.php";
 $iframeSrc = $baseUrl . "/empty.php";
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $payInStatusRequest = new PayInStatusRequest(getenv('ALGOCASH_MERCHANTID'), getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
-    $payInStatusRequest
-        ->setMerchantTxId($_POST['merchant_tx_id']);
+    if (isset($_GET['tx_type']) && $_GET['tx_type'] == 'payout') {
+        $statusRequest = new TxStatusRequest('payout', getenv('ALGOCASH_MERCHANTID'), getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
+    } else {
+        $statusRequest = new TxStatusRequest('payin', getenv('ALGOCASH_MERCHANTID'), getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
+    }
 
-    $payInStatusResponse = $payInStatusRequest->send();
+    $statusRequest->setMerchantTxId($_POST['merchant_tx_id']);
+
+    $payInStatusResponse = $statusRequest->send();
     error_log('[+] ' . __METHOD__ . ' on line ' . __LINE__ . ' => ' . $payInStatusResponse->getResponse());
 
     $payInStatusResponse->send();
@@ -29,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 ?><!DOCTYPE html>
 <html>
     <head>
-        <title>Transaction Status Tester</title>
+        <title>Transaction <?php echo isset($_GET['tx_type']) ? ucfirst($_GET['tx_type']) : ucfirst('payin'); ?> Status Tester</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.min.js" integrity="sha512-5BqtYqlWfJemW5+v+TZUs22uigI8tXeVah5S/1Z6qBLVO7gakAOtkOzUtgq6dsIo5c0NJdmGPs0H9I+2OHUHVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/css/bootstrap.min.css" integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -55,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
             //processButton.disable();
             $.ajax({
-                url: 'status.php',
+                url: 'status.php?tx_type=<?php echo ($_GET['tx_type'] === 'payout') ? 'payout' : 'payin'; ?>'
                 type : "POST",
                 data : $("#action_form").serialize(),
                 success : function(result) {
@@ -94,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                             <a href="index.php" class="btn btn-primary">Back</a>
                         </div>
                     </div>
-                    <h3 class="text-center">Transaction Status</h3>
+                    <h3 class="text-center">Transaction <?php echo isset($_GET['tx_type']) ? ucfirst($_GET['tx_type']) : ucfirst('payin'); ?> Status</h3>
                     <form id="action_form" onsubmit="return processSubmit(event);">
                     <div class="mb-3 row">
                         <label for="merchant_tx_id" class="col-sm-4 col-form-label">Merchant Tx ID</label>

@@ -76,7 +76,12 @@
             </div>
             <div class="row align-items-center pt-4">
                 <div class="col text-center">
-                    <a href="status.php" class="w-25 btn btn-primary">Transaction Status</a>
+                    <a href="status.php?tx_type=payin" class="w-25 btn btn-primary">PayIn Transaction Status</a>
+                </div>
+            </div>
+            <div class="row align-items-center pt-4">
+                <div class="col text-center">
+                    <a href="status.php?tx_type=payout" class="w-25 btn btn-primary">PayOut Transaction Status</a>
                 </div>
             </div>
             <div class="row align-items-center pt-4">

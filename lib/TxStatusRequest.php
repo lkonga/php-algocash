@@ -6,12 +6,13 @@ use AlgorithmicCash\SignHelper;
 use AlgorithmicCash\PaymentUrl;
 use Web3\Utils;
 
-class PayInStatusRequest {
+class TxStatusRequest {
     private $privateKey = "";
     private $rpcUrl = "";
     private $signHelper;
 
     private $merchantId = "";
+    private $requestType;
     private $customerEmail = "";
 
     private $customerPhoneNumber = "";
@@ -42,8 +43,9 @@ class PayInStatusRequest {
 
     private $payInUrl = "";
 
-    public function __construct(string $merchantId, string $privateKey, string $rpcUrl = "") {
+    public function __construct(string $merchantId, string $requestType, string $privateKey, string $rpcUrl = "") {
         $this->merchantId = $merchantId;
+        $this->requestType = $requestType;
         $this->privateKey = $privateKey;
         $this->rpcUrl = $rpcUrl;
         $this->signHelper = new SignHelper($privateKey, $rpcUrl);
@@ -80,7 +82,7 @@ class PayInStatusRequest {
         return $this->signHelper->generateSignature($requestHash);
     }
 
-    public function send(): PayInStatusResponse {
+    public function send(): statusResponse {
         $request = $this->getRequestVars();
         $requestSignature = $this->getRequestSignature();
         $result = json_encode([
@@ -90,10 +92,17 @@ class PayInStatusRequest {
 
 
         $client = PayHTTPClient::getClient();
+
+        /**
+         * @var callable $urlBuilderMethod
+         * The method name can be either 'buildPayInStatusUrl' or 'buildPayOutStatusUrl'
+         */
+        $urlBuilderMethod = $this->requestType === 'payin' ? 'buildPayInStatusUrl' : 'buildPayOutStatusUrl';
         try {
+            /** @noinspection PhpUndefinedMethodInspection */
             $response = $client->request(
                 'GET',
-                PaymentUrl::buildPayInStatusUrl([
+                PaymentUrl::$urlBuilderMethod([
                     'merchant_id' => $this->merchantId
                 ]),
                 [
@@ -139,54 +148,11 @@ class PayInStatusRequest {
             ]);
         }
 
-        return new PayInStatusResponse($result);
+        return new statusResponse($result);
     }
 
-    public function setMerchantTxId(string $txId) : PayInStatusRequest {
+    public function setMerchantTxId(string $txId) : TxStatusRequest {
         $this->request['merchant_tx_id'] = $txId;
-        return $this;
-    }
-
-    public function setCustomerEmail(string $email): PayInStatusRequest {
-        $this->customerEmail = $email;
-        return $this;
-    }
-
-    public function setCustomerPhoneNumber(string $phone_number): PayInStatusRequest {
-        $this->customerPhoneNumber = $phone_number;
-        return $this;
-    }
-
-    public function setAmount(string $amount) : PayInStatusRequest {
-        $this->request['request_amount'] = (string) $amount;
-        $this->request['amount'] = Utils::toWei($amount, 'ether')->toString();
-        return $this;
-    }
-
-    public function setSupportUrl(string $url) : PayInStatusRequest {
-        $this->request['support_url'] = $url;
-        return $this;
-    }
-
-    public function setSuccessUrl(string $url) : PayInStatusRequest {
-        $this->request['success_url'] = $url;
-        return $this;
-    }
-
-    public function setFailureUrl(string $url) : PayInStatusRequest {
-        $this->request['failure_url'] = $url;
-        return $this;
-    }
-
-    public function setHandlerUrl(string $url) : PayInStatusRequest {
-        $this->request['ipn_url'] = $url;
-        return $this;
-    }
-
-    //@TODO: Move to a decorator to not introduce many changes compared to upstream
-    public function setHandlerPmUrl(string $url): PayInStatusRequest
-    {
-        $this->request['pm_callback_url'] = $url;
         return $this;
     }
 

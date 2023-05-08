@@ -1,7 +1,7 @@
 <?php
 namespace AlgorithmicCash;
 
-class PayInStatusResponse {
+class statusResponse {
     public $responseData;
     public $response;
 
