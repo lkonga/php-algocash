@@ -15,9 +15,9 @@ $iframeSrc = $baseUrl . "/empty.php";
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (isset($_GET['tx_type']) && $_GET['tx_type'] == 'payout') {
-        $statusRequest = new TxStatusRequest('payout', getenv('ALGOCASH_MERCHANTID'), getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
+        $statusRequest = new TxStatusRequest(getenv('ALGOCASH_MERCHANTID'), 'payout', getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
     } else {
-        $statusRequest = new TxStatusRequest('payin', getenv('ALGOCASH_MERCHANTID'), getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
+        $statusRequest = new TxStatusRequest(getenv('ALGOCASH_MERCHANTID'), 'payin',  getenv('ALGOCASH_PRIVATEKEY'), getenv('ALGOCASH_RPCURL'));
     }
 
     $statusRequest->setMerchantTxId($_POST['merchant_tx_id']);
@@ -58,8 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $('#processing_result').text('Requesting ....');
 
             //processButton.disable();
+
+            // Get the value of the tx_type $_GET variable
+            const urlParams = new URLSearchParams(window.location.search);
+            const txType = urlParams.get('tx_type');
+
+            // Build the AJAX request URL with the tx_type query parameter
+            const ajaxUrl = `status.php?tx_type=${txType}`;
             $.ajax({
-                url: 'status.php?tx_type=<?php echo ($_GET['tx_type'] === 'payout') ? 'payout' : 'payin'; ?>'
+                url: ajaxUrl,
                 type : "POST",
                 data : $("#action_form").serialize(),
                 success : function(result) {

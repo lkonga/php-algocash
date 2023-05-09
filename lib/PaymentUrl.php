@@ -3,7 +3,7 @@ namespace AlgorithmicCash;
 
 class PaymentUrl {
     const PAYIN_URL = "https://api.algorithmic.cash/request_payin.php";
-    const PAYOUT_URL = "https://api.algorithmic.cash/request_payout.php";
+    const PAYOUT_URL = "https://payout-api.algorithmic.cash/request_payout.php";
     const PAYBALANCE_URL = "https://api.algorithmic.cash/request_balance.php";
     const PAYIN_STATUS_URL = "https://api.algorithmic.cash/request_payin_status.php";
     const PAYOUT_STATUS_URL = "https://payout-api.algorithmic.cash/request_payout_status.php";
