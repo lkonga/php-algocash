@@ -8,6 +8,7 @@ class PaymentUrl {
     const PAYIN_STATUS_URL = "https://api.algorithmic.cash/request_payin_status.php";
     const PAYOUT_STATUS_URL = "https://payout-api.algorithmic.cash/request_payout_status.php";
 
+
     public static function buildPayInStatusUrl(array $params): string
     {
         return self::PAYIN_STATUS_URL . '?' . http_build_query($params);
